@@ -58,6 +58,7 @@ private:
 public:
   //-----------------------------------------------------------------------
   Window(): power(0x55), lowswitch(false), powerlow(0x3E) {
+    setWindowTitle("NXT PC Remote Control");
     resize(250,100);
 
     scan      = new MyButton("Buscar");
