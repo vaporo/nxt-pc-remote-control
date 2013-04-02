@@ -3,7 +3,7 @@
 
 int main(int argCount,char* argValues[]) {
   QApplication app(argCount,argValues);
-  Window* w = new Window();
-  w->show();
+  Window w;
+  w.show();
   return app.exec();
 }

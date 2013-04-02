@@ -58,36 +58,36 @@ private:
   QMenu         *recents;
 
   QStringList loadRecents() {
-     QStringList list;
-     QFile f("nxt-pc-remote-contro.cfg");
-     f.open(QIODevice::ReadOnly);
-     if (!f.isOpen()) return list;
-     QString data = f.readLine().data();
-     while (!data.isEmpty()) {
-        list.append(data);
-        data = f.readLine().data();
-     }
+    QStringList list;
+    QFile f("nxt-pc-remote-contro.cfg");
+    f.open(QIODevice::ReadOnly);
+    if (!f.isOpen()) return list;
+    QString data = f.readLine().data();
+    while (!data.isEmpty()) {
+      list.append(data);
+      data = f.readLine().data();
+    }
 
-     f.close();
-     return list;
+    f.close();
+    return list;
   }
 
   void addRecent(QString data) {
-     QFile f("nxt-pc-remote-contro.cfg");
-     f.open(QIODevice::ReadOnly);
-     if (!f.isOpen()) return;
-     QString temp = f.readLine().data();
-     while (!temp.isEmpty()) {
-        if (temp == data) return;
-        data = f.readLine().data();
-     }
-     f.close();
+    data+="\n";
+    foreach (QAction* action, recents->actions()) {
+      if (action->text() == data)return;
+    }
+    recents->addAction(data);
+  }
 
-     f.open(QIODevice::Append);
-     if (!f.isOpen()) return;
-     f.write(data.toStdString().c_str());
-     f.write("\n");
-     f.close();
+  void saveRecents() {
+    QFile f("nxt-pc-remote-contro.cfg");
+    f.open(QIODevice::WriteOnly);
+    if (!f.isOpen()) return;
+    foreach (QAction* action, recents->actions()) {
+      f.write( action->text().toStdString().c_str() );
+    }
+    f.close();
   }
 
 public:
@@ -145,6 +145,7 @@ public:
 
   //-----------------------------------------------------------------------
   ~Window() {
+    saveRecents();
     delete net;
   }
 
@@ -340,7 +341,6 @@ public slots:
       bind->setText("Desconectar");
       setEnabled(true);
       addRecent(devices->currentText());
-      recents->addAction(devices->currentText());
     }
     else {
       net->unbind();
