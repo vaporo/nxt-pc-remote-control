@@ -57,19 +57,16 @@ private:
   QMenu         *menu;
   QMenu         *recents;
 
-  QStringList loadRecents() {
-    QStringList list;
+  void loadRecents() {
     QFile f("nxt-pc-remote-contro.cfg");
     f.open(QIODevice::ReadOnly);
-    if (!f.isOpen()) return list;
+    if (!f.isOpen()) return;
     QString data = f.readLine().data();
     while (!data.isEmpty()) {
-      list.append(data);
+      recents->addAction(data);
       data = f.readLine().data();
     }
-
     f.close();
-    return list;
   }
 
   void addRecent(QString data) {
@@ -130,11 +127,7 @@ public:
     setFixedSize(278,438);
     recents = new QMenu("Conexiones Recientes");
     menu->addMenu(recents);
-    QStringList list = loadRecents();
-    foreach (QString data, list) {
-       recents->addAction(data);
-    }
-
+    loadRecents();
     net = new Network();
 
     connect(scan,SIGNAL(clicked()),this,SLOT(scanDevices()));
