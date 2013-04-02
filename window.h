@@ -10,6 +10,7 @@
 #include <QKeyEvent>
 #include <QProgressBar>
 #include <QMenu>
+#include <QFile>
 #include <network.h>
 
 #define length(x) sizeof(x)/sizeof(byte)
@@ -54,6 +55,40 @@ private:
   Network       *net;
   QProgressBar  *lowspeed,*highspeed;
   QMenu         *menu;
+  QMenu         *recents;
+
+  QStringList loadRecents() {
+     QStringList list;
+     QFile f("nxt-pc-remote-contro.cfg");
+     f.open(QIODevice::ReadOnly);
+     if (!f.isOpen()) return list;
+     QString data = f.readLine().data();
+     while (!data.isEmpty()) {
+        list.append(data);
+        data = f.readLine().data();
+     }
+
+     f.close();
+     return list;
+  }
+
+  void addRecent(QString data) {
+     QFile f("nxt-pc-remote-contro.cfg");
+     f.open(QIODevice::ReadOnly);
+     if (!f.isOpen()) return;
+     QString temp = f.readLine().data();
+     while (!temp.isEmpty()) {
+        if (temp == data) return;
+        data = f.readLine().data();
+     }
+     f.close();
+
+     f.open(QIODevice::Append);
+     if (!f.isOpen()) return;
+     f.write(data.toStdString().c_str());
+     f.write("\n");
+     f.close();
+  }
 
 public:
   //-----------------------------------------------------------------------
@@ -93,9 +128,12 @@ public:
     highspeed->setValue(power);
 
     setFixedSize(278,438);
-    QMenu *recents = new QMenu("Conexiones Recientes");
+    recents = new QMenu("Conexiones Recientes");
     menu->addMenu(recents);
-    recents->addAction("00:16:53:0C:4D:86  [NXT]");
+    QStringList list = loadRecents();
+    foreach (QString data, list) {
+       recents->addAction(data);
+    }
 
     net = new Network();
 
@@ -301,6 +339,8 @@ public slots:
       devices->setEnabled(false);
       bind->setText("Desconectar");
       setEnabled(true);
+      addRecent(devices->currentText());
+      recents->addAction(devices->currentText());
     }
     else {
       net->unbind();
