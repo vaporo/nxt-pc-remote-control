@@ -313,8 +313,14 @@ public slots:
     }
     catch(int e) {
       switch(e) {
-      case 1: info->setText("Bluetooth deshabilitado"); break;
-      case 2: devices->clear(); devices->addItem("No hay dispositivos cercanos"); break;
+        case 1: {
+          devices->addItem("Bluetooth deshabilitado");
+          break;
+        }
+        case 2: {
+          devices->addItem("No hay dispositivos cercanos");
+          break;
+        }
       }
       info->setPixmap(QPixmap(":/images/info.png"));
       setEnabled(true);
@@ -352,15 +358,22 @@ public slots:
   void recentSelection(QAction* action) {
     info->setPixmap(QPixmap(":/images/clock.png"));
     setEnabled(false);
-    repaint();
-    net->bind(action->text().left(17));
-    info->setPixmap(QPixmap(":/images/info.png"));
-    scan->setEnabled(false);
     devices->clear();
-    devices->addItem(action->text());
-    devices->setEnabled(false);
-    bind->setText("Desconectar");
-    bind->setEnabled(true);
+    devices->addItem(action->text().left(action->text().size()-1));
+    repaint();
+    if (net->bind(action->text().left(17))) {
+      scan->setEnabled(false);
+      devices->setEnabled(false);
+      bind->setText("Desconectar");
+      bind->setEnabled(true);
+    }
+    else {
+      devices->clear();
+      devices->addItem("El dispositivo ya no esta disponible");
+      devices->setEnabled(false);
+    }
+    repaint();
+    info->setPixmap(QPixmap(":/images/info.png"));
     setEnabled(true);
   }
 };

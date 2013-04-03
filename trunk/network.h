@@ -95,7 +95,6 @@ public:
     sock = hci_open_dev( dev_id );
     if (dev_id < 0 || sock < 0) {
         perror("opening socket");
-        devices.append("[Bluetooth deshabilitado]");
         throw(1);
     }
 
@@ -106,9 +105,7 @@ public:
 
     num_rsp = hci_inquiry(dev_id, len, max_rsp, NULL, &ii, flags);
     if( num_rsp <= 0 ) {
-      devices.append("[No hay equipos cercanos]");
       throw(2);
-      //perror("hci_inquiry");
     }
 
     for (i = 0; i < num_rsp; i++) {
