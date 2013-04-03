@@ -12,6 +12,7 @@
 #include <QMenu>
 #include <QFile>
 #include <network.h>
+#include <idiom.h>
 
 #define length(x) sizeof(x)/sizeof(byte)
 #define non(x) (byte)-(x)
@@ -56,6 +57,7 @@ private:
   QProgressBar  *lowspeed,*highspeed;
   QMenu         *menu;
   QMenu         *recents;
+  Idiom         idiom;
 
   void loadRecents() {
     QFile f("nxt-pc-remote-contro.cfg");
@@ -90,12 +92,12 @@ private:
 public:
   //-----------------------------------------------------------------------
   Window(): power(0x55), lowswitch(false), powerlow(0x3E) {
-    setWindowTitle("NXT PC Remote Control");
+    setWindowTitle(idiom.getWindowTitle());
     resize(250,100);
 
-    scan      = new MyButton("Buscar");
+    scan      = new MyButton(idiom.getScanButtonLabel());
     devices   = new QComboBox();
-    bind      = new MyButton("Conectar");
+    bind      = new MyButton(idiom.getConnectButtonLabel());
     info      = new QLabel();
     lowspeed  = new QProgressBar();
     highspeed = new QProgressBar();
@@ -115,7 +117,7 @@ public:
 
     devices->setEnabled(false);
     bind->setEnabled(false);
-    info->setPixmap(QPixmap(":/images/info.png"));
+    info->setPixmap(QPixmap(idiom.getImageInfo()));
     setStyleSheet("QFrame{background-color:white}");
     lowspeed->setMinimum(0x32);
     lowspeed->setMaximum(0x64);
@@ -125,7 +127,7 @@ public:
     highspeed->setValue(power);
 
     setFixedSize(278,438);
-    recents = new QMenu("Conexiones Recientes");
+    recents = new QMenu(idiom.getMenuRecentConnections());
     menu->addMenu(recents);
     loadRecents();
     net = new Network();
@@ -144,7 +146,7 @@ public:
 
 protected:
   void keyPressEvent(QKeyEvent *event) {
-    if (bind->text() == "Conectar") return;
+    if (bind->text() == idiom.connectButtonLabel) return;
     if (!event->isAutoRepeat()) {
       switch (event->key()) {
 
@@ -266,7 +268,7 @@ protected:
   }
 
   void keyReleaseEvent(QKeyEvent *event) {
-    if (bind->text() == "Conectar") return;
+    if (bind->text() == idiom.getConnectButtonLabel()) return;
     if (!event->isAutoRepeat()) {
       switch (event->key()) {
         case Qt::Key_Up:
@@ -300,13 +302,13 @@ public slots:
   void scanDevices() {
     try {
       devices->clear();
-      devices->addItem("Buscando Dispositivos...");
+      devices->addItem(idiom.getMessageSearching());
       info->setPixmap(QPixmap(":/images/clock.png"));
       setEnabled(false);
       repaint();
       devices->clear();
       devices->addItems(net->scanDevices());
-      info->setPixmap(QPixmap(":/images/info.png"));
+      info->setPixmap(QPixmap(idiom.getImageInfo()));
       devices->setEnabled(true);
       bind->setEnabled(true);
       setEnabled(true);
@@ -314,30 +316,30 @@ public slots:
     catch(int e) {
       switch(e) {
         case 1: {
-          devices->addItem("Bluetooth deshabilitado");
+          devices->addItem(idiom.getMessageBluetoothDisabled());
           break;
         }
         case 2: {
-          devices->addItem("No hay dispositivos cercanos");
+          devices->addItem(idiom.getMessageNearDivices());
           break;
         }
       }
-      info->setPixmap(QPixmap(":/images/info.png"));
+      info->setPixmap(QPixmap(idiom.getImageInfo()));
       setEnabled(true);
     }
   }
 
   //-----------------------------------------------------------------------
   void connectDevice() {
-    if (bind->text() == "Conectar") {
+    if (bind->text() == idiom.getConnectButtonLabel()) {
       info->setPixmap(QPixmap(":/images/clock.png"));
       setEnabled(false);
       repaint();
       net->bind(devices->currentText().left(17));
-      info->setPixmap(QPixmap(":/images/info.png"));
+      info->setPixmap(QPixmap(idiom.getImageInfo()));
       scan->setEnabled(false);
       devices->setEnabled(false);
-      bind->setText("Desconectar");
+      bind->setText(idiom.getDisconnectButtonLabel());
       setEnabled(true);
       addRecent(devices->currentText());
     }
@@ -345,7 +347,7 @@ public slots:
       net->unbind();
       scan->setEnabled(true);
       devices->setEnabled(true);
-      bind->setText("Conectar");
+      bind->setText(idiom.getConnectButtonLabel());
     }
   }
 
@@ -364,16 +366,16 @@ public slots:
     if (net->bind(action->text().left(17))) {
       scan->setEnabled(false);
       devices->setEnabled(false);
-      bind->setText("Desconectar");
+      bind->setText(idiom.getDisconnectButtonLabel());
       bind->setEnabled(true);
     }
     else {
       devices->clear();
-      devices->addItem("El dispositivo ya no esta disponible");
+      devices->addItem(idiom.getMessageDeviceAvailable());
       devices->setEnabled(false);
     }
     repaint();
-    info->setPixmap(QPixmap(":/images/info.png"));
+    info->setPixmap(QPixmap(idiom.getImageInfo()));
     setEnabled(true);
   }
 };
