@@ -43,6 +43,23 @@ protected:
 
 //=========================================================================
 
+class MyLabel : public QLabel {
+  Q_OBJECT
+signals:
+  void rightClick(QPoint);
+protected:
+  void mousePressEvent(QMouseEvent *ev) {
+    if (ev->button() == Qt::RightButton) {
+      emit rightClick(ev->pos());
+    }
+    else {
+      ev->ignore();
+    }
+  }
+};
+
+//=========================================================================
+
 class Window : public QFrame {
   Q_OBJECT
 private:
@@ -52,11 +69,11 @@ private:
   //-----------------------
   MyButton      *scan,*bind;
   QComboBox     *devices;
-  QLabel        *info;
+  MyLabel       *info;
   Network       *net;
   QProgressBar  *lowspeed,*highspeed;
   QMenu         *menu;
-  QMenu         *recents;
+  QMenu         *recents,*selectidiom;
   Idiom         idiom;
 
   void loadRecents() {
@@ -98,7 +115,7 @@ public:
     scan      = new MyButton(idiom.getScanButtonLabel());
     devices   = new QComboBox();
     bind      = new MyButton(idiom.getConnectButtonLabel());
-    info      = new QLabel();
+    info      = new MyLabel();
     lowspeed  = new QProgressBar();
     highspeed = new QProgressBar();
     menu      = new QMenu();
@@ -128,14 +145,25 @@ public:
 
     setFixedSize(278,438);
     recents = new QMenu(idiom.getMenuRecentConnections());
+    selectidiom = new QMenu(idiom.getMenuSelectIdiom());
     menu->addMenu(recents);
+    menu->addAction(idiom.getMenuClearConnections());
+    menu->addSeparator();
+    menu->addMenu(selectidiom);
+    menu->addSeparator();
+    menu->addAction(idiom.getMenuAbout());
+    selectidiom->addAction(idiom.getMenuEnglish());
+    selectidiom->addAction(idiom.getMenuSpanish());
+
     loadRecents();
     net = new Network();
 
     connect(scan,SIGNAL(clicked()),this,SLOT(scanDevices()));
     connect(bind,SIGNAL(clicked()),this,SLOT(connectDevice()));
-    connect(scan,SIGNAL(rightClick(QPoint)),this,SLOT(recentConnections(QPoint)));
-    connect(menu,SIGNAL(triggered(QAction*)),this,SLOT(recentSelection(QAction*)));
+    connect(info,SIGNAL(rightClick(QPoint)),this,SLOT(popMenu(QPoint)));
+    connect(menu,SIGNAL(triggered(QAction*)),this,SLOT(menuOption(QAction*)));
+    connect(recents,SIGNAL(triggered(QAction*)),this,SLOT(recentSelection(QAction*)));
+    connect(selectidiom,SIGNAL(triggered(QAction*)),this,SLOT(changeIdiom(QAction*)));
   }
 
   //-----------------------------------------------------------------------
@@ -340,6 +368,7 @@ public slots:
       scan->setEnabled(false);
       devices->setEnabled(false);
       bind->setText(idiom.getDisconnectButtonLabel());
+      recents->setEnabled(false);
       setEnabled(true);
       addRecent(devices->currentText());
     }
@@ -348,12 +377,13 @@ public slots:
       scan->setEnabled(true);
       devices->setEnabled(true);
       bind->setText(idiom.getConnectButtonLabel());
+      recents->setEnabled(true);
     }
   }
 
   //-----------------------------------------------------------------------
-  void recentConnections(QPoint point) {
-    menu->exec(mapToGlobal(point));
+  void popMenu(QPoint point) {
+    menu->exec(info->mapToGlobal(point));
   }
 
   //-----------------------------------------------------------------------
@@ -377,6 +407,21 @@ public slots:
     repaint();
     info->setPixmap(QPixmap(idiom.getImageInfo()));
     setEnabled(true);
+  }
+
+  //-----------------------------------------------------------------------
+  void changeIdiom(QAction* action) {
+    std::cout << action->text().toStdString() << std::endl;
+  }
+
+  //-----------------------------------------------------------------------
+  void menuOption(QAction* action) {
+    if (action->text()==idiom.getMenuAbout()) {
+      std::cout << action->text().toStdString() << std::endl;
+    }
+    else if (action->text()==idiom.getMenuClearConnections()) {
+      recents->clear();
+    }
   }
 };
 

@@ -15,6 +15,11 @@ public:
   QString connectButtonLabel[2];
   QString disconnectButtonLabel[2];
   QString menuRecentConnections[2];
+  QString menuClearConnections[2];
+  QString menuSelectIdiom[2];
+  QString menuEnglish[2];
+  QString menuSpanish[2];
+  QString menuAbout[2];
   QString messageSearching[2];
   QString messageBluetoothDisabled[2];
   QString messageNearDivices[2];
@@ -36,6 +41,21 @@ public:
 
     menuRecentConnections[ENG] = "Recent connections";
     menuRecentConnections[SPA] = "Conexiones Recientes";
+
+    menuClearConnections[ENG] = "Clean connections";
+    menuClearConnections[SPA] = "Limpiar conexiones";
+
+    menuSelectIdiom[ENG] = "Choose idiom";
+    menuSelectIdiom[SPA] = "Seleccionar idioma";
+
+    menuEnglish[ENG] = "English";
+    menuEnglish[SPA] = "Ingles";
+
+    menuSpanish[ENG] = "Spanish";
+    menuSpanish[SPA] = "Español";
+
+    menuAbout[ENG] = "About...";
+    menuAbout[SPA] = "Acerca de...";
 
     messageSearching[ENG] = "Searching to devices...";
     messageSearching[SPA] = "Buscando Dispositivos...";
@@ -65,6 +85,11 @@ public:
   QString getConnectButtonLabel()       { return connectButtonLabel[it]; }
   QString getDisconnectButtonLabel()    { return disconnectButtonLabel[it]; }
   QString getMenuRecentConnections()    { return menuRecentConnections[it]; }
+  QString getMenuClearConnections()     { return menuClearConnections[it]; }
+  QString getMenuSelectIdiom()          { return menuSelectIdiom[it]; }
+  QString getMenuEnglish()              { return menuEnglish[it]; }
+  QString getMenuSpanish()              { return menuSpanish[it]; }
+  QString getMenuAbout()                { return menuAbout[it]; }
   QString getMessageSearching()         { return messageSearching[it]; }
   QString getMessageBluetoothDisabled() { return messageBluetoothDisabled[it]; }
   QString getMessageNearDivices()       { return messageNearDivices[it]; }
