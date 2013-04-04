@@ -411,7 +411,29 @@ public slots:
 
   //-----------------------------------------------------------------------
   void changeIdiom(QAction* action) {
-    std::cout << action->text().toStdString() << std::endl;
+    bool idiomchanged=false;
+    if (action->text()==idiom.getMenuEnglish() && idiom.getIdiomType()!=ENG) {
+      idiom.setIdiomType(ENG);
+      idiomchanged=true;
+    }
+    else if (action->text()==idiom.getMenuSpanish() && idiom.getIdiomType()!=SPA) {
+      idiom.setIdiomType(SPA);
+      idiomchanged=true;
+    }
+
+    if (idiomchanged) {
+      setWindowTitle(idiom.getWindowTitle());
+      scan->setText(idiom.getScanButtonLabel());
+      scan->isEnabled() ? bind->setText(idiom.getConnectButtonLabel()) : bind->setText(idiom.getDisconnectButtonLabel());
+      info->setPixmap(QPixmap(idiom.getImageInfo()));
+      selectidiom->clear();
+      selectidiom->addAction(idiom.getMenuEnglish());
+      selectidiom->addAction(idiom.getMenuSpanish());
+      menu->actions().at(0)->setText(idiom.getMenuRecentConnections());
+      menu->actions().at(1)->setText(idiom.getMenuClearConnections());
+      menu->actions().at(3)->setText(idiom.getMenuSelectIdiom());
+      menu->actions().at(5)->setText(idiom.getMenuAbout());
+    }
   }
 
   //-----------------------------------------------------------------------

@@ -80,6 +80,12 @@ public:
     }
   }
 
+  void setIdiomType(idiomtype newit)  {
+    it = newit;
+  }
+
+  idiomtype getIdiomType()              { return it; }
+
   QString getWindowTitle()              { return windowTitle[it]; }
   QString getScanButtonLabel()          { return scanButtonLabel[it]; }
   QString getConnectButtonLabel()       { return connectButtonLabel[it]; }
