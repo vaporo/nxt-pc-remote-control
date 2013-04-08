@@ -63,7 +63,7 @@ public:
     messageBluetoothDisabled[ENG] = "Bluetooth disabled";
     messageBluetoothDisabled[SPA] = "Bluetooth deshabilitado";
 
-    messageNearDivices[ENG] = "There isn´t near diveces";
+    messageNearDivices[ENG] = "There isn´t near devices";
     messageNearDivices[SPA] = "No hay dispositivos cercanos";
 
     messageDeviceAvailable[ENG] = "Device isn´t available";

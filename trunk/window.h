@@ -14,7 +14,7 @@
 #include <network.h>
 #include <idiom.h>
 
-#define length(x) sizeof(x)/sizeof(byte)
+#define len(x) sizeof(x)/sizeof(byte)
 #define non(x) (byte)-(x)
 
 //=========================================================================
@@ -76,18 +76,24 @@ private:
   QMenu         *recents,*selectidiom;
   Idiom         idiom;
 
-  void loadRecents() {
-    QFile f("nxt-pc-remote-contro.cfg");
+  void loadSettings() {
+    QFile f(".nxt-pc-remote-contro.cfg");
     f.open(QIODevice::ReadOnly);
-    if (!f.isOpen()) return;
-    QString data = f.readLine().data();
-    while (!data.isEmpty()) {
-      recents->addAction(data);
-      data = f.readLine().data();
+    if (!f.isOpen()) {
+       idiom.setIdiomType(ENG);
+       return;
     }
+    QString data = f.readLine().data();
+    idiom.setIdiomType(data=="eng\n"?ENG:SPA);
+    int recentsCount = f.readLine().toInt();
+    for (int i=0; i<recentsCount; i++) {
+      data = f.readLine().data();
+      recents->addAction(data);
+    }
+    refreshIdiom();
     f.close();
   }
-
+//-----------------------------------------------------------------------
   void addRecent(QString data) {
     data+="\n";
     foreach (QAction* action, recents->actions()) {
@@ -95,15 +101,34 @@ private:
     }
     recents->addAction(data);
   }
-
-  void saveRecents() {
-    QFile f("nxt-pc-remote-contro.cfg");
+   //-----------------------------------------------------------------------
+  void saveSettings() {
+    QFile f(".nxt-pc-remote-contro.cfg");
     f.open(QIODevice::WriteOnly);
     if (!f.isOpen()) return;
+    f.write( idiom.getIdiomType()==ENG?"eng\n":"spa\n" );
+    char size[4];
+    sprintf( size,"%d\n", recents->actions().length() );
+    f.write( size );
     foreach (QAction* action, recents->actions()) {
       f.write( action->text().toStdString().c_str() );
     }
     f.close();
+  }
+
+  //-----------------------------------------------------------------------
+  void refreshIdiom() {
+      setWindowTitle(idiom.getWindowTitle());
+      scan->setText(idiom.getScanButtonLabel());
+      scan->isEnabled() ? bind->setText(idiom.getConnectButtonLabel()) : bind->setText(idiom.getDisconnectButtonLabel());
+      info->setPixmap(QPixmap(idiom.getImageInfo()));
+      selectidiom->clear();
+      selectidiom->addAction(idiom.getMenuEnglish());
+      selectidiom->addAction(idiom.getMenuSpanish());
+      menu->actions().at(0)->setText(idiom.getMenuRecentConnections());
+      menu->actions().at(1)->setText(idiom.getMenuClearConnections());
+      menu->actions().at(3)->setText(idiom.getMenuSelectIdiom());
+      menu->actions().at(5)->setText(idiom.getMenuAbout());
   }
 
 public:
@@ -155,7 +180,7 @@ public:
     selectidiom->addAction(idiom.getMenuEnglish());
     selectidiom->addAction(idiom.getMenuSpanish());
 
-    loadRecents();
+    loadSettings();
     net = new Network();
 
     connect(scan,SIGNAL(clicked()),this,SLOT(scanDevices()));
@@ -168,7 +193,7 @@ public:
 
   //-----------------------------------------------------------------------
   ~Window() {
-    saveRecents();
+    saveSettings();
     delete net;
   }
 
@@ -186,56 +211,56 @@ protected:
         case Qt::Key_B: {
           byte bytes[] = { 0x03, 0x0B, 0x02, 0xF4, 0x01 };
           Telegram t;
-          t.append(bytes, length(bytes));
+          t.append(bytes, len(bytes));
           net->directCommand(t);
           break;
         }
 
         case Qt::Key_Up : {
           byte bytes3[] = { 0x04, 0x01, lowswitch?powerlow:power, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes3, length(bytes3));
+          net->directCommand(bytes3, len(bytes3));
 
           byte bytes4[] = { 0x04, 0x02, lowswitch?powerlow:power, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes4, length(bytes4));
+          net->directCommand(bytes4, len(bytes4));
           break;
         }
 
         case Qt::Key_Down : {
           byte bytes3[] = { 0x04, 0x01, lowswitch?non(powerlow):non(power), 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes3, length(bytes3));
+          net->directCommand(bytes3, len(bytes3));
 
           byte bytes4[] = { 0x04, 0x02, lowswitch?non(powerlow):non(power), 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes4, length(bytes4));
+          net->directCommand(bytes4, len(bytes4));
           break;
         }
 
         case Qt::Key_Left : {
           byte bytes3[] = { 0x04, 0x01, lowswitch?non(powerlow):non(power), 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes3, length(bytes3));
+          net->directCommand(bytes3, len(bytes3));
 
           byte bytes4[] = { 0x04, 0x02, lowswitch?powerlow:power, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes4, length(bytes4));
+          net->directCommand(bytes4, len(bytes4));
           break;
         }
 
         case Qt::Key_Right : {
           byte bytes3[] = { 0x04, 0x01, lowswitch?powerlow:power, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes3, length(bytes3));
+          net->directCommand(bytes3, len(bytes3));
 
           byte bytes4[] = { 0x04, 0x02, lowswitch?non(powerlow):non(power), 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes4, length(bytes4));
+          net->directCommand(bytes4, len(bytes4));
           break;
         }
 
         case Qt::Key_N : {
           byte bytes3[] = { 0x04, 0x00, lowswitch?powerlow:power, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes3, length(bytes3));
+          net->directCommand(bytes3, len(bytes3));
           break;
         }
 
         case Qt::Key_M : {
           byte bytes3[] = { 0x04, 0x00, lowswitch?non(powerlow):non(power), 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes3, length(bytes3));
+          net->directCommand(bytes3, len(bytes3));
           break;
         }
 
@@ -306,13 +331,13 @@ protected:
         case Qt::Key_N:
         case Qt::Key_M: {
           byte bytes0[] = { 0x04, 0x00, power, 0x02, 0x01, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes0, length(bytes0));
+          net->directCommand(bytes0, len(bytes0));
 
           byte bytes1[] = { 0x04, 0x01, power, 0x02, 0x01, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes1, length(bytes1));
+          net->directCommand(bytes1, len(bytes1));
 
           byte bytes2[] = { 0x04, 0x02, power, 0x02, 0x01, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
-          net->directCommand(bytes2, length(bytes2));
+          net->directCommand(bytes2, len(bytes2));
           break;
         }
 
@@ -410,30 +435,16 @@ public slots:
   }
 
   //-----------------------------------------------------------------------
-  void changeIdiom(QAction* action) {
-    bool idiomchanged=false;
-    if (action->text()==idiom.getMenuEnglish() && idiom.getIdiomType()!=ENG) {
-      idiom.setIdiomType(ENG);
-      idiomchanged=true;
-    }
-    else if (action->text()==idiom.getMenuSpanish() && idiom.getIdiomType()!=SPA) {
-      idiom.setIdiomType(SPA);
-      idiomchanged=true;
-    }
 
-    if (idiomchanged) {
-      setWindowTitle(idiom.getWindowTitle());
-      scan->setText(idiom.getScanButtonLabel());
-      scan->isEnabled() ? bind->setText(idiom.getConnectButtonLabel()) : bind->setText(idiom.getDisconnectButtonLabel());
-      info->setPixmap(QPixmap(idiom.getImageInfo()));
-      selectidiom->clear();
-      selectidiom->addAction(idiom.getMenuEnglish());
-      selectidiom->addAction(idiom.getMenuSpanish());
-      menu->actions().at(0)->setText(idiom.getMenuRecentConnections());
-      menu->actions().at(1)->setText(idiom.getMenuClearConnections());
-      menu->actions().at(3)->setText(idiom.getMenuSelectIdiom());
-      menu->actions().at(5)->setText(idiom.getMenuAbout());
-    }
+  void changeIdiom(QAction *action) {
+     if (action->text()==idiom.getMenuEnglish() && idiom.getIdiomType()!=ENG) {
+       idiom.setIdiomType(ENG);
+       refreshIdiom();
+     }
+     else if (action->text()==idiom.getMenuSpanish() && idiom.getIdiomType()!=SPA) {
+       idiom.setIdiomType(SPA);
+       refreshIdiom();
+     }
   }
 
   //-----------------------------------------------------------------------
