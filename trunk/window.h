@@ -63,10 +63,9 @@ protected:
 class Window : public QFrame {
   Q_OBJECT
 private:
-  byte        power;
-  bool        lowswitch;
-  byte        powerlow;
-  //-----------------------
+  byte          power;
+  bool          lowswitch;
+  byte          powerlow;
   MyButton      *scan,*bind;
   QComboBox     *devices;
   MyLabel       *info;
@@ -76,8 +75,9 @@ private:
   QMenu         *recents,*selectidiom;
   Idiom         idiom;
 
+  //-----------------------------------------------------------------------
   void loadSettings() {
-    QFile f(".nxt-pc-remote-contro.cfg");
+    QFile f(".nxt-pc-remote-control.cfg");
     f.open(QIODevice::ReadOnly);
     if (!f.isOpen()) {
        idiom.setIdiomType(ENG);
@@ -85,7 +85,9 @@ private:
     }
     QString data = f.readLine().data();
     idiom.setIdiomType(data=="eng\n"?ENG:SPA);
-    int recentsCount = f.readLine().toInt();
+    QString data2 = f.readLine();
+    int recentsCount = data2.toInt();
+    //std::cout << data2.toStdString() << " " << recentsCount << std::endl;
     for (int i=0; i<recentsCount; i++) {
       data = f.readLine().data();
       recents->addAction(data);
@@ -93,7 +95,8 @@ private:
     refreshIdiom();
     f.close();
   }
-//-----------------------------------------------------------------------
+
+  //-----------------------------------------------------------------------
   void addRecent(QString data) {
     data+="\n";
     foreach (QAction* action, recents->actions()) {
@@ -101,9 +104,10 @@ private:
     }
     recents->addAction(data);
   }
-   //-----------------------------------------------------------------------
+
+  //-----------------------------------------------------------------------
   void saveSettings() {
-    QFile f(".nxt-pc-remote-contro.cfg");
+    QFile f(".nxt-pc-remote-control.cfg");
     f.open(QIODevice::WriteOnly);
     if (!f.isOpen()) return;
     f.write( idiom.getIdiomType()==ENG?"eng\n":"spa\n" );
@@ -118,20 +122,21 @@ private:
 
   //-----------------------------------------------------------------------
   void refreshIdiom() {
-      setWindowTitle(idiom.getWindowTitle());
-      scan->setText(idiom.getScanButtonLabel());
-      scan->isEnabled() ? bind->setText(idiom.getConnectButtonLabel()) : bind->setText(idiom.getDisconnectButtonLabel());
-      info->setPixmap(QPixmap(idiom.getImageInfo()));
-      selectidiom->clear();
-      selectidiom->addAction(idiom.getMenuEnglish());
-      selectidiom->addAction(idiom.getMenuSpanish());
-      menu->actions().at(0)->setText(idiom.getMenuRecentConnections());
-      menu->actions().at(1)->setText(idiom.getMenuClearConnections());
-      menu->actions().at(3)->setText(idiom.getMenuSelectIdiom());
-      menu->actions().at(5)->setText(idiom.getMenuAbout());
+    setWindowTitle(idiom.getWindowTitle());
+    scan->setText(idiom.getScanButtonLabel());
+    scan->isEnabled() ? bind->setText(idiom.getConnectButtonLabel()) : bind->setText(idiom.getDisconnectButtonLabel());
+    info->setPixmap(QPixmap(idiom.getImageInfo()));
+    selectidiom->clear();
+    selectidiom->addAction(idiom.getMenuEnglish());
+    selectidiom->addAction(idiom.getMenuSpanish());
+    menu->actions().at(0)->setText(idiom.getMenuRecentConnections());
+    menu->actions().at(1)->setText(idiom.getMenuClearConnections());
+    menu->actions().at(3)->setText(idiom.getMenuSelectIdiom());
+    menu->actions().at(5)->setText(idiom.getMenuAbout());
   }
 
 public:
+
   //-----------------------------------------------------------------------
   Window(): power(0x55), lowswitch(false), powerlow(0x3E) {
     setWindowTitle(idiom.getWindowTitle());
@@ -393,9 +398,9 @@ public slots:
       scan->setEnabled(false);
       devices->setEnabled(false);
       bind->setText(idiom.getDisconnectButtonLabel());
-      recents->setEnabled(false);
       setEnabled(true);
       addRecent(devices->currentText());
+      for (int i=0; i<4;i++) menu->actions().at(i)->setEnabled(false);
     }
     else {
       net->unbind();
@@ -403,6 +408,7 @@ public slots:
       devices->setEnabled(true);
       bind->setText(idiom.getConnectButtonLabel());
       recents->setEnabled(true);
+      for (int i=0; i<4;i++) menu->actions().at(i)->setEnabled(true);
     }
   }
 
@@ -423,6 +429,7 @@ public slots:
       devices->setEnabled(false);
       bind->setText(idiom.getDisconnectButtonLabel());
       bind->setEnabled(true);
+      for (int i=0; i<4;i++) menu->actions().at(i)->setEnabled(false);
     }
     else {
       devices->clear();
