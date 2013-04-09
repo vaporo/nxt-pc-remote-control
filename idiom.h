@@ -45,8 +45,8 @@ public:
     menuClearConnections[ENG] = "Clean connections";
     menuClearConnections[SPA] = "Limpiar conexiones";
 
-    menuSelectIdiom[ENG] = "Choose idiom";
-    menuSelectIdiom[SPA] = "Seleccionar idioma";
+    menuSelectIdiom[ENG] = "Switch language";
+    menuSelectIdiom[SPA] = "Cambiar idioma";
 
     menuEnglish[ENG] = "English";
     menuEnglish[SPA] = "Ingles";
