@@ -6,4 +6,9 @@ This project aims provide to Linux users, control a Lego NXT Robot by means of a
 
 = Main features =
 
-== Simplicity ==
+== Minimalist ==
+
+Its user interface is very simple, preserving the essential one.  User may play with his NXT Robot in three natural steps:
+# Run nxt-pc-remote-control app
+# Scan devices
+# Connect device
