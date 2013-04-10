@@ -1,0 +1,5 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+This project aims provide to Linux users, control a Lego NXT Robot by means of a PC Remote Control using bluetooth device.
