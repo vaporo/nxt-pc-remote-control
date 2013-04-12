@@ -15,5 +15,3 @@ RESOURCES += \
 
 LIBS += -lbluetooth
 
-target.path = /usr/local/bin/
-INSTALLS += target
