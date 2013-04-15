@@ -47,13 +47,14 @@ class MyLabel : public QLabel {
   Q_OBJECT
 signals:
   void rightClick(QPoint);
+  void clicked(bool);
 protected:
   void mousePressEvent(QMouseEvent *ev) {
     if (ev->button() == Qt::RightButton) {
       emit rightClick(ev->pos());
     }
     else {
-      ev->ignore();
+      emit clicked(false);
     }
   }
 };
@@ -194,6 +195,7 @@ public:
     connect(menu,SIGNAL(triggered(QAction*)),this,SLOT(menuOption(QAction*)));
     connect(recents,SIGNAL(triggered(QAction*)),this,SLOT(recentSelection(QAction*)));
     connect(selectidiom,SIGNAL(triggered(QAction*)),this,SLOT(changeIdiom(QAction*)));
+    connect(info,SIGNAL(clicked(bool)),this,SLOT(showAbout(bool)));
   }
 
   //-----------------------------------------------------------------------
@@ -448,7 +450,7 @@ public slots:
        idiom.setIdiomType(ENG);
        refreshIdiom();
      }
-     else if (action->text()==idiom.getMenuSpanish() && idiom.getIdiomType()!=SPA) {
+     else if (action->text().left(3)==idiom.getMenuSpanish().left(3) && idiom.getIdiomType()!=SPA) {
        idiom.setIdiomType(SPA);
        refreshIdiom();
      }
@@ -457,12 +459,23 @@ public slots:
   //-----------------------------------------------------------------------
   void menuOption(QAction* action) {
     if (action->text()==idiom.getMenuAbout()) {
-      std::cout << action->text().toStdString() << std::endl;
+      showAbout(true);
     }
     else if (action->text()==idiom.getMenuClearConnections()) {
       recents->clear();
     }
   }
+
+  //-----------------------------------------------------------------------
+  void showAbout(bool state) {
+    if (state==true) {
+      info->setPixmap(QPixmap(":/images/about.png"));
+    }
+    else {
+      info->setPixmap(QPixmap(idiom.getImageInfo()));
+    }
+  }
+
 };
 
 #endif // WINDOW_H
