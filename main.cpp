@@ -1,4 +1,4 @@
-#include <qt4/QtGui/QApplication>
+#include <QApplication>
 #include <window.h>
 
 int main(int argCount,char* argValues[]) {
