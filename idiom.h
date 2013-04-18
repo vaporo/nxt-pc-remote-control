@@ -7,6 +7,10 @@ enum idiomtype{
   ENG=0,SPA=1
 };
 
+/** ========================================================================
+ * @brief The Idiom class is used to enable to "NXT PC Remote Contro" to
+ * change systematically between two idioms: English and Spanish
+ */
 class Idiom {
 public:
   idiomtype it;
@@ -26,6 +30,11 @@ public:
   QString messageDeviceAvailable[2];
   QString imageInfo[2];
 public:
+
+  /** ----------------------------------------------------------------------
+   * @brief Idiom constructor launch the attributes values.  This class, has
+   * all text needed to show in application interface.
+   */
   Idiom() : it(ENG) {
     windowTitle[ENG] = "NXT PC Remote Control";
     windowTitle[SPA] = "Control Remoto de PC para NXT";
@@ -73,6 +82,10 @@ public:
     imageInfo[SPA] = ":/images/info-spa.png";
   }
 
+  /** ----------------------------------------------------------------------
+   * @brief getText method return the current set idiom
+   * @return first three letters of idom
+   */
   QString getText() {
     switch (it) {
     case ENG: return "eng";
@@ -80,9 +93,18 @@ public:
     }
   }
 
+  /** ----------------------------------------------------------------------
+   * @brief setIdiomType method, put a new selected idiom
+   * @param new idiom (of idiomtype)
+   */
   void setIdiomType(idiomtype newit)  {
     it = newit;
   }
+
+  /** ----------------------------------------------------------------------
+   * @brief the next methods return all attributes values, namely,
+   * this methods return de messages in current idiom.
+   */
 
   idiomtype getIdiomType()              { return it; }
 

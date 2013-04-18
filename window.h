@@ -17,20 +17,38 @@
 #define len(x) sizeof(x)/sizeof(byte)
 #define non(x) (byte)-(x)
 
-//=========================================================================
-
+/** ========================================================================
+ * @brief MyButton class overload to QPushButton due to, was necesary do
+ * programming with especial events.
+ */
 class MyButton : public QPushButton {
   Q_OBJECT
 public:
+
+  /** ----------------------------------------------------------------------
+   * @brief MyButton constructor transport label to superclass
+   */
   MyButton(QString label) : QPushButton(label) {
   }
 signals:
+
+  /** ----------------------------------------------------------------------
+   * @brief This is an abstract method to rightClick() programming event
+   */
   void rightClick(QPoint);
 
 protected:
+
+  /** ----------------------------------------------------------------------
+   * @brief keyPressEvent create a keyboard press event
+   */
   void keyPressEvent(QKeyEvent *ev) {
     ev->ignore();
   }
+
+  /** ----------------------------------------------------------------------
+   * @brief mousePressEvent create a mouse click event
+   */
   void mousePressEvent(QMouseEvent *ev) {
     if (ev->button() == Qt::RightButton) {
       emit rightClick(ev->pos());
@@ -41,14 +59,29 @@ protected:
   }
 };
 
-//=========================================================================
-
+/** ========================================================================
+ * @brief MyLabel class overload to QLabel due to, was necesary do
+ * programming with especial events.
+ */
 class MyLabel : public QLabel {
   Q_OBJECT
 signals:
+
+  /** ----------------------------------------------------------------------
+   * @brief This is an abstract method to rightClick() programming event
+   */
   void rightClick(QPoint);
+
+  /** ----------------------------------------------------------------------
+   * @brief This is an abstract method to clicked() programming event
+   */
   void clicked(bool);
+
 protected:
+
+  /** ----------------------------------------------------------------------
+   * @brief mousePressEvent create a mouse click event
+   */
   void mousePressEvent(QMouseEvent *ev) {
     if (ev->button() == Qt::RightButton) {
       emit rightClick(ev->pos());
@@ -59,8 +92,11 @@ protected:
   }
 };
 
-//=========================================================================
-
+/** ========================================================================
+ * @brief Window class is the main class en this project, because has the
+ * GUI functions to intercommunicate two actors.  NXT PC Remote Control and
+ * LEGO gameer.
+ */
 class Window : public QFrame {
   Q_OBJECT
 private:
@@ -76,7 +112,10 @@ private:
   QMenu         *recents,*selectidiom;
   Idiom         idiom;
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief loadSettings method set de initial profiles to NXT PC Remote
+   * Control using source file ".nxt-pc-remote-control.cfg"
+   */
   void loadSettings() {
     QFile f(".nxt-pc-remote-control.cfg");
     f.open(QIODevice::ReadOnly);
@@ -97,7 +136,9 @@ private:
     f.close();
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief addRecent method admin de cache of connections worked
+   */
   void addRecent(QString data) {
     data+="\n";
     foreach (QAction* action, recents->actions()) {
@@ -106,7 +147,9 @@ private:
     recents->addAction(data);
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief saveSettings save current application settings into a file
+   */
   void saveSettings() {
     QFile f(".nxt-pc-remote-control.cfg");
     f.open(QIODevice::WriteOnly);
@@ -121,7 +164,9 @@ private:
     f.close();
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief refreshIdiom method update idiom of application.
+   */
   void refreshIdiom() {
     setWindowTitle(idiom.getWindowTitle());
     scan->setText(idiom.getScanButtonLabel());
@@ -138,7 +183,10 @@ private:
 
 public:
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief Window constructor launch application saving information in its
+   * attribute, additionally, update GUI presentation.
+   */
   Window(): power(0x55), lowswitch(false), powerlow(0x3E) {
     setWindowTitle(idiom.getWindowTitle());
     resize(250,100);
@@ -198,13 +246,20 @@ public:
     connect(info,SIGNAL(clicked(bool)),this,SLOT(showAbout(bool)));
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief Window destructor to exec saving settings and clear memory
+   */
   ~Window() {
     saveSettings();
     delete net;
   }
 
 protected:
+
+  /** ----------------------------------------------------------------------
+   * @brief keyPressEvent exec commands when user is play with NXT PC
+   * Remote Control.
+   */
   void keyPressEvent(QKeyEvent *event) {
     if (bind->text() == idiom.connectButtonLabel) return;
     if (!event->isAutoRepeat()) {
@@ -327,6 +382,10 @@ protected:
     }
   }
 
+  /** ----------------------------------------------------------------------
+   * @brief keyReleaseEvent leave commands when user is play with NXT PC
+   * Remote Control.
+   */
   void keyReleaseEvent(QKeyEvent *event) {
     if (bind->text() == idiom.getConnectButtonLabel()) return;
     if (!event->isAutoRepeat()) {
@@ -358,7 +417,11 @@ protected:
   }
 
 public slots:
-  //-----------------------------------------------------------------------
+
+  /** ----------------------------------------------------------------------
+   * @brief scanDevices method search all devices with bluetooth
+   * functionality.
+   */
   void scanDevices() {
     try {
       devices->clear();
@@ -389,7 +452,9 @@ public slots:
     }
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief connectDevice bind NXT PC Remote Control with a wanted device
+   */
   void connectDevice() {
     if (bind->text() == idiom.getConnectButtonLabel()) {
       info->setPixmap(QPixmap(":/images/clock.png"));
@@ -414,12 +479,18 @@ public slots:
     }
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief popMenu method show a flotating menu with some additional
+   * options.
+   */
   void popMenu(QPoint point) {
     menu->exec(info->mapToGlobal(point));
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief recentSelection method short way, in the connection event.  It
+   * method is exec when an user use the cache connections.
+   */
   void recentSelection(QAction* action) {
     info->setPixmap(QPixmap(":/images/clock.png"));
     setEnabled(false);
@@ -443,8 +514,10 @@ public slots:
     setEnabled(true);
   }
 
-  //-----------------------------------------------------------------------
-
+  /** ----------------------------------------------------------------------
+   * @brief changeIdiom method switch de interface language between Englis
+   * and Spanish
+   */
   void changeIdiom(QAction *action) {
      if (action->text()==idiom.getMenuEnglish() && idiom.getIdiomType()!=ENG) {
        idiom.setIdiomType(ENG);
@@ -456,7 +529,10 @@ public slots:
      }
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief menuOption method exec two of all additional options: Show about,
+   * and Clear cache connections
+   */
   void menuOption(QAction* action) {
     if (action->text()==idiom.getMenuAbout()) {
       showAbout(true);
@@ -466,7 +542,9 @@ public slots:
     }
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief showAbout method, show the author information.
+   */
   void showAbout(bool state) {
     if (state==true) {
       info->setPixmap(QPixmap(":/images/about.png"));
