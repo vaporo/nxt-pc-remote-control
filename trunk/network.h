@@ -10,17 +10,21 @@ typedef unsigned char byte;
 #include <unistd.h>
 #include <bluetooth/rfcomm.h>
 #include <iostream>
-/**
- * @brief The Telegram class
- * Telegram class transport all information between Window class and
- * Network class.
+
+/** ========================================================================
+ * @brief The Telegram class transport all information between Window class
+ * and Network class.
  */
 class Telegram {
 private:
   byte* content;
   int   size;
 public:
-  //-----------------------------------------------------------------------
+
+  /** ----------------------------------------------------------------------
+   * @brief Telegram constructor launch its attributes and set de three first
+   * bytes of telegram.  These bytes are mecanically
+   */
   Telegram() : content(NULL) , size(3) {
     content = new byte[size];
     content[0] = size-2;
@@ -28,14 +32,18 @@ public:
     content[2] = 0x80; // Direct Command whitout response
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief Telegram constructor to copy process events.
+   */
   Telegram(Telegram& source) {
     size = source.size;
     content = new byte[size];
     for (int i=0;i<size;i++) content[i] = source.content[i];
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief append method, add new bytes to end of telegram.
+   */
   void append(byte piece) {
     byte* aux = new byte[size+1];
     for (int i=0;i<size;i++) aux[i] = content[i];
@@ -46,41 +54,47 @@ public:
     content[0] = size-2;
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief append method with more than one bytes... add to end of telegram
+   * all bytes sended in "pieces" array.
+   */
   void append(byte* pieces, int count) {
     for (int i=0; i<count; i++) {
       append(pieces[i]);
     }
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief Telegram destructor is important to keep clear to computer
+   * memory
+   */
   ~Telegram() {
     delete content;
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief send method put in socket communications the telegram.
+   */
   bool send(int sock) {
     return write(sock, content, size);
   }
 };
 
 
-
-/**
- * @brief The Network class
- * Network class work as low level, allow send and recive information
- * of Bluetooth device connected.
+/** ========================================================================
+ * @brief The Network class work as low level, allow send and recive
+ * information of Bluetooth device connected.
  */
 class Network {
 private:
   QString macAddress;
   int     sock;
 public:
-  //-----------------------------------------------------------------------
-  Network() {
-  }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief scanDevices method... search bluetooth devices around of computer.
+   * This method will inactive the application during 10 seconds approximately.
+   */
   QStringList scanDevices() {
     QStringList devices;
 
@@ -125,7 +139,9 @@ public:
     return devices;
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief bind methoc... connect the applications with wanted device.
+   */
   bool bind(QString address) {
     macAddress = address;
     struct sockaddr_rc addr; //  = { 0 };
@@ -141,19 +157,26 @@ public:
     }
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief unbind method... disconnect the applications
+   */
   void unbind() {
     close(sock);
   }
 
-  //-----------------------------------------------------------------------
+  /** ----------------------------------------------------------------------
+   * @brief directCommand... it's disposed to be a middle layer between
+   * GUI interface and low layer "blueZ"
+   */
   bool directCommand(Telegram t) {
     t.send(sock);
     return true;
   }
 
-  //-----------------------------------------------------------------------
-  bool directCommand(byte* pieces, int count) {
+  /** ----------------------------------------------------------------------
+   * @brief directCommand with bytes array... it's disposed to be a middle
+   * layer between GUI interface and low layer "blueZ" sended a lot of bytes
+   */  bool directCommand(byte* pieces, int count) {
     Telegram t;
     t.append(pieces, count);
     t.send(sock);
