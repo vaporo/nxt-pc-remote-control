@@ -170,7 +170,8 @@ private:
   void refreshIdiom() {
     setWindowTitle(idiom.getWindowTitle());
     scan->setText(idiom.getScanButtonLabel());
-    scan->isEnabled() ? bind->setText(idiom.getConnectButtonLabel()) : bind->setText(idiom.getDisconnectButtonLabel());
+    scan->isEnabled() ? bind->setText(idiom.getConnectButtonLabel()) :
+                        bind->setText(idiom.getDisconnectButtonLabel());
     info->setPixmap(QPixmap(idiom.getImageInfo()));
     selectidiom->clear();
     selectidiom->addAction(idiom.getMenuEnglish());
@@ -279,49 +280,59 @@ protected:
         }
 
         case Qt::Key_Up : {
-          byte bytes3[] = { 0x04, 0x01, lowswitch?powerlow:power, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes3[] = { 0x04, 0x01, lowswitch?powerlow:power,
+                            0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
           net->directCommand(bytes3, len(bytes3));
 
-          byte bytes4[] = { 0x04, 0x02, lowswitch?powerlow:power, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes4[] = { 0x04, 0x02, lowswitch?powerlow:power,
+                            0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
           net->directCommand(bytes4, len(bytes4));
           break;
         }
 
         case Qt::Key_Down : {
-          byte bytes3[] = { 0x04, 0x01, lowswitch?non(powerlow):non(power), 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes3[] = { 0x04, 0x01, lowswitch?non(powerlow):non(power),
+                            0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
           net->directCommand(bytes3, len(bytes3));
 
-          byte bytes4[] = { 0x04, 0x02, lowswitch?non(powerlow):non(power), 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes4[] = { 0x04, 0x02, lowswitch?non(powerlow):non(power),
+                            0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
           net->directCommand(bytes4, len(bytes4));
           break;
         }
 
         case Qt::Key_Left : {
-          byte bytes3[] = { 0x04, 0x01, lowswitch?non(powerlow):non(power), 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes3[] = { 0x04, 0x01, lowswitch?non(powerlow):non(power),
+                            0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
           net->directCommand(bytes3, len(bytes3));
 
-          byte bytes4[] = { 0x04, 0x02, lowswitch?powerlow:power, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes4[] = { 0x04, 0x02, lowswitch?powerlow:power,
+                            0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
           net->directCommand(bytes4, len(bytes4));
           break;
         }
 
         case Qt::Key_Right : {
-          byte bytes3[] = { 0x04, 0x01, lowswitch?powerlow:power, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes3[] = { 0x04, 0x01, lowswitch?powerlow:power,
+                            0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
           net->directCommand(bytes3, len(bytes3));
 
-          byte bytes4[] = { 0x04, 0x02, lowswitch?non(powerlow):non(power), 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes4[] = { 0x04, 0x02, lowswitch?non(powerlow):non(power),
+                            0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
           net->directCommand(bytes4, len(bytes4));
           break;
         }
 
         case Qt::Key_N : {
-          byte bytes3[] = { 0x04, 0x00, lowswitch?powerlow:power, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes3[] = { 0x04, 0x00, lowswitch?powerlow:power,
+                            0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
           net->directCommand(bytes3, len(bytes3));
           break;
         }
 
         case Qt::Key_M : {
-          byte bytes3[] = { 0x04, 0x00, lowswitch?non(powerlow):non(power), 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes3[] = { 0x04, 0x00, lowswitch?non(powerlow):non(power),
+                            0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
           net->directCommand(bytes3, len(bytes3));
           break;
         }
@@ -396,13 +407,16 @@ protected:
         case Qt::Key_Right:
         case Qt::Key_N:
         case Qt::Key_M: {
-          byte bytes0[] = { 0x04, 0x00, power, 0x02, 0x01, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes0[] = { 0x04, 0x00, power, 0x02, 0x01, 0x00, 0x20, 0x00,
+                            0x00, 0x00, 0x00 };
           net->directCommand(bytes0, len(bytes0));
 
-          byte bytes1[] = { 0x04, 0x01, power, 0x02, 0x01, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes1[] = { 0x04, 0x01, power, 0x02, 0x01, 0x00, 0x20, 0x00,
+                            0x00, 0x00, 0x00 };
           net->directCommand(bytes1, len(bytes1));
 
-          byte bytes2[] = { 0x04, 0x02, power, 0x02, 0x01, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00 };
+          byte bytes2[] = { 0x04, 0x02, power, 0x02, 0x01, 0x00, 0x20, 0x00,
+                            0x00, 0x00, 0x00 };
           net->directCommand(bytes2, len(bytes2));
           break;
         }
@@ -523,7 +537,8 @@ public slots:
        idiom.setIdiomType(ENG);
        refreshIdiom();
      }
-     else if (action->text().left(3)==idiom.getMenuSpanish().left(3) && idiom.getIdiomType()!=SPA) {
+     else if (action->text().left(3)==idiom.getMenuSpanish().left(3) &&
+              idiom.getIdiomType()!=SPA) {
        idiom.setIdiomType(SPA);
        refreshIdiom();
      }

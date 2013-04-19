@@ -125,7 +125,8 @@ public:
     for (i = 0; i < num_rsp; i++) {
         ba2str(&(ii+i)->bdaddr, addr);
         memset(name, 0, sizeof(name));
-        if (hci_read_remote_name(sock, &(ii+i)->bdaddr, sizeof(name), name, 0) < 0) {
+        if (hci_read_remote_name(sock, &(ii+i)->bdaddr, sizeof(name), name, 0)
+            < 0) {
           strcpy(name, "unknown");
         }
         char text[30];
