@@ -106,6 +106,10 @@ private:
   int operation;
 
 signals:
+
+  /** ----------------------------------------------------------------------
+   * @brief Creating events to after running.
+   */
   void scanPerformed(int);
   void connectPerformed();
 
@@ -604,7 +608,7 @@ public slots:
    * and Spanish
    */
   void changeIdiom(QAction *action) {
-     if (action->text()==idiom.getMenuEnglish() && idiom.getIdiomType()!=ENG) {
+     if (action->text().left(3)==idiom.getMenuEnglish().left(3) && idiom.getIdiomType()!=ENG) {
        idiom.setIdiomType(ENG);
        refreshIdiom();
      }
