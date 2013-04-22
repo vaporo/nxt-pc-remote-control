@@ -11,6 +11,8 @@
 #include <QProgressBar>
 #include <QMenu>
 #include <QFile>
+#include <QThread>
+
 #include <network.h>
 #include <idiom.h>
 
@@ -93,6 +95,54 @@ protected:
 };
 
 /** ========================================================================
+ * @brief Thread class is implemented for fix disable GUI programmed in
+ * another release of this applications.
+ */
+class Thread : public QThread {
+  Q_OBJECT
+private:
+  QComboBox* devices;
+  Network* net;
+  int operation;
+
+signals:
+  void scanPerformed(int);
+  void connectPerformed();
+
+public:
+  /** ----------------------------------------------------------------------
+   * @brief Thread constructor receive device combo and network references
+   * to allow work with them.
+   */
+  Thread(QComboBox* combo,Network* n,int op)
+    : devices(combo), net(n), operation(op)  {
+  }
+
+  /** ----------------------------------------------------------------------
+   * @brief run method has actions to exec in thread.
+   */
+  void run() {
+    switch (operation) {
+    case 1:
+      devices->clear();
+      try {
+        QStringList s = net->scanDevices();
+        devices->addItems(s);
+        emit scanPerformed(0);
+      }
+      catch(int e) {
+        emit scanPerformed(e);
+      }
+      break;
+    case 2:
+      net->bind(devices->currentText().left(17));
+      emit connectPerformed();
+      break;
+    }
+  }
+};
+
+/** ========================================================================
  * @brief Window class is the main class en this project, because has the
  * GUI functions to intercommunicate two actors.  NXT PC Remote Control and
  * LEGO gameer.
@@ -111,6 +161,7 @@ private:
   QMenu         *menu;
   QMenu         *recents,*selectidiom;
   Idiom         idiom;
+  Thread        *t;
 
   /** ----------------------------------------------------------------------
    * @brief loadSettings method set de initial profiles to NXT PC Remote
@@ -437,21 +488,34 @@ public slots:
    * functionality.
    */
   void scanDevices() {
-    try {
-      devices->clear();
-      devices->addItem(idiom.getMessageSearching());
-      info->setPixmap(QPixmap(":/images/clock.png"));
-      setEnabled(false);
-      repaint();
-      devices->clear();
-      devices->addItems(net->scanDevices());
-      info->setPixmap(QPixmap(idiom.getImageInfo()));
-      devices->setEnabled(true);
+    devices->clear();
+    devices->setEnabled(false);
+    bind->setEnabled(false);
+    scan->setEnabled(false);
+    devices->addItem(idiom.getMessageSearching());
+    info->setPixmap(QPixmap(":/images/clock.png"));
+    info->setEnabled(false);
+
+    t = new Thread(devices,net,1);
+    connect(t,SIGNAL(scanPerformed(int)),this,SLOT(scanPerformed(int)));
+    t->start();
+  }
+
+  /** ----------------------------------------------------------------------
+   * @brief scanPerformed is run after net scan->
+   */
+  void scanPerformed(int throwstate) {
+    info->setPixmap(QPixmap(idiom.getImageInfo()));
+    info->setEnabled(true);
+    devices->setEnabled(true);
+    scan->setEnabled(true);
+    info->setPixmap(QPixmap(idiom.getImageInfo()));
+    if (throwstate==0) {
       bind->setEnabled(true);
-      setEnabled(true);
     }
-    catch(int e) {
-      switch(e) {
+    else {
+      bind->setEnabled(false);
+      switch(throwstate) {
         case 1: {
           devices->addItem(idiom.getMessageBluetoothDisabled());
           break;
@@ -461,9 +525,8 @@ public slots:
           break;
         }
       }
-      info->setPixmap(QPixmap(idiom.getImageInfo()));
-      setEnabled(true);
     }
+    delete t;
   }
 
   /** ----------------------------------------------------------------------
@@ -472,16 +535,10 @@ public slots:
   void connectDevice() {
     if (bind->text() == idiom.getConnectButtonLabel()) {
       info->setPixmap(QPixmap(":/images/clock.png"));
-      setEnabled(false);
-      repaint();
-      net->bind(devices->currentText().left(17));
-      info->setPixmap(QPixmap(idiom.getImageInfo()));
-      scan->setEnabled(false);
-      devices->setEnabled(false);
-      bind->setText(idiom.getDisconnectButtonLabel());
-      setEnabled(true);
-      addRecent(devices->currentText());
-      for (int i=0; i<4;i++) menu->actions().at(i)->setEnabled(false);
+      info->setEnabled(false);
+      t = new Thread(devices,net,1);
+      connect(t,SIGNAL(connectPerformed()),this,SLOT(connectPerformed()));
+      t->start();
     }
     else {
       net->unbind();
@@ -491,6 +548,20 @@ public slots:
       recents->setEnabled(true);
       for (int i=0; i<4;i++) menu->actions().at(i)->setEnabled(true);
     }
+  }
+
+  /** ----------------------------------------------------------------------
+   * @brief connectPerfomred is run after net bind function.
+   */
+  void connectPerformed() {
+    info->setPixmap(QPixmap(idiom.getImageInfo()));
+    info->setEnabled(true);
+    scan->setEnabled(false);
+    devices->setEnabled(false);
+    bind->setText(idiom.getDisconnectButtonLabel());
+    addRecent(devices->currentText());
+    for (int i=0; i<4;i++) menu->actions().at(i)->setEnabled(false);
+    delete t;
   }
 
   /** ----------------------------------------------------------------------
