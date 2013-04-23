@@ -63,8 +63,8 @@ public:
     menuSpanish[ENG] = "Spanish";
     menuSpanish[SPA] = "Espanol";
 
-    menuAbout[ENG] = "About...";
-    menuAbout[SPA] = "Acerca de...";
+    menuAbout[ENG] = "About (Ver.0-34)";
+    menuAbout[SPA] = "Acerca de (Ver.0-34)";
 
     messageSearching[ENG] = "Searching to devices...";
     messageSearching[SPA] = "Buscando Dispositivos...";
