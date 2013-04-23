@@ -128,18 +128,21 @@ public:
   void run() {
     switch (operation) {
     case 1:
-      devices->clear();
       try {
         QStringList s = net->scanDevices();
+        devices->clear();
         devices->addItems(s);
         emit scanPerformed(0);
       }
       catch(int e) {
+        devices->clear();
         emit scanPerformed(e);
       }
       break;
     case 2:
-      emit connectPerformed(net->bind(devices->currentText().left(17)));
+      bool state = net->bind(devices->currentText().left(17));
+      devices->clear();
+      emit connectPerformed(state);
       break;
     }
   }
@@ -181,7 +184,6 @@ private:
     idiom.setIdiomType(data=="eng\n"?ENG:SPA);
     QString data2 = f.readLine();
     int recentsCount = data2.toInt();
-    //std::cout << data2.toStdString() << " " << recentsCount << std::endl;
     for (int i=0; i<recentsCount; i++) {
       data = f.readLine().data();
       recents->addAction(data);
@@ -227,9 +229,8 @@ private:
     scan->isEnabled() ? bind->setText(idiom.getConnectButtonLabel()) :
                         bind->setText(idiom.getDisconnectButtonLabel());
     info->setPixmap(QPixmap(idiom.getImageInfo()));
-    selectidiom->clear();
-    selectidiom->addAction(idiom.getMenuEnglish());
-    selectidiom->addAction(idiom.getMenuSpanish());
+    selectidiom->actions().at(0)->setText(idiom.getMenuEnglish());
+    selectidiom->actions().at(1)->setText(idiom.getMenuSpanish());
     menu->actions().at(0)->setText(idiom.getMenuRecentConnections());
     menu->actions().at(1)->setText(idiom.getMenuClearConnections());
     menu->actions().at(3)->setText(idiom.getMenuSelectIdiom());
@@ -569,6 +570,8 @@ public slots:
     }
     else {
       scan->setEnabled(true);
+      devices->clear();
+      devices->addItem(idiom.getMessageDeviceAvailable());
       devices->setEnabled(true);
     }
     bind->setEnabled(true);
@@ -589,25 +592,15 @@ public slots:
    */
   void recentSelection(QAction* action) {
     info->setPixmap(QPixmap(":/images/clock.png"));
-    setEnabled(false);
+    info->setEnabled(false);
+    bind->setEnabled(false);
+    scan->setEnabled(false);
     devices->clear();
     devices->addItem(action->text().left(action->text().size()-1));
-    repaint();
-    if (net->bind(action->text().left(17))) {
-      scan->setEnabled(false);
-      devices->setEnabled(false);
-      bind->setText(idiom.getDisconnectButtonLabel());
-      bind->setEnabled(true);
-      for (int i=0; i<4;i++) menu->actions().at(i)->setEnabled(false);
-    }
-    else {
-      devices->clear();
-      devices->addItem(idiom.getMessageDeviceAvailable());
-      devices->setEnabled(false);
-    }
-    repaint();
-    info->setPixmap(QPixmap(idiom.getImageInfo()));
-    setEnabled(true);
+    devices->setEnabled(false);
+    t = new Thread(devices,net,2);
+    connect(t,SIGNAL(connectPerformed(bool)),this,SLOT(connectPerformed(bool)));
+    t->start();
   }
 
   /** ----------------------------------------------------------------------
