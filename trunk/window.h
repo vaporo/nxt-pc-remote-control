@@ -141,7 +141,6 @@ public:
       break;
     case 2:
       bool state = net->bind(devices->currentText().left(17));
-      devices->clear();
       emit connectPerformed(state);
       break;
     }
