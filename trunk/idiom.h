@@ -61,7 +61,7 @@ public:
     menuEnglish[SPA] = "Ingles";
 
     menuSpanish[ENG] = "Spanish";
-    menuSpanish[SPA] = "Español";
+    menuSpanish[SPA] = "Espanol";
 
     menuAbout[ENG] = "About...";
     menuAbout[SPA] = "Acerca de...";
@@ -72,10 +72,10 @@ public:
     messageBluetoothDisabled[ENG] = "Bluetooth disabled";
     messageBluetoothDisabled[SPA] = "Bluetooth deshabilitado";
 
-    messageNearDivices[ENG] = "There isn´t near devices";
+    messageNearDivices[ENG] = "There isn't near devices";
     messageNearDivices[SPA] = "No hay dispositivos cercanos";
 
-    messageDeviceAvailable[ENG] = "Device isn´t available";
+    messageDeviceAvailable[ENG] = "Device isn't available";
     messageDeviceAvailable[SPA] = "El dispositivo ya no esta disponible";
 
     imageInfo[ENG] = ":/images/info-eng.png";
