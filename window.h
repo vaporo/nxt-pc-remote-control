@@ -111,7 +111,7 @@ signals:
    * @brief Creating events to after running.
    */
   void scanPerformed(int);
-  void connectPerformed();
+  void connectPerformed(bool);
 
 public:
   /** ----------------------------------------------------------------------
@@ -139,8 +139,7 @@ public:
       }
       break;
     case 2:
-      net->bind(devices->currentText().left(17));
-      emit connectPerformed();
+      emit connectPerformed(net->bind(devices->currentText().left(17)));
       break;
     }
   }
@@ -540,8 +539,11 @@ public slots:
     if (bind->text() == idiom.getConnectButtonLabel()) {
       info->setPixmap(QPixmap(":/images/clock.png"));
       info->setEnabled(false);
-      t = new Thread(devices,net,1);
-      connect(t,SIGNAL(connectPerformed()),this,SLOT(connectPerformed()));
+      bind->setEnabled(false);
+      scan->setEnabled(false);
+      devices->setEnabled(false);
+      t = new Thread(devices,net,2);
+      connect(t,SIGNAL(connectPerformed(bool)),this,SLOT(connectPerformed(bool)));
       t->start();
     }
     else {
@@ -557,14 +559,19 @@ public slots:
   /** ----------------------------------------------------------------------
    * @brief connectPerfomred is run after net bind function.
    */
-  void connectPerformed() {
+  void connectPerformed(bool ok) {
     info->setPixmap(QPixmap(idiom.getImageInfo()));
     info->setEnabled(true);
-    scan->setEnabled(false);
-    devices->setEnabled(false);
-    bind->setText(idiom.getDisconnectButtonLabel());
-    addRecent(devices->currentText());
-    for (int i=0; i<4;i++) menu->actions().at(i)->setEnabled(false);
+    if (ok) {
+      bind->setText(idiom.getDisconnectButtonLabel());
+      addRecent(devices->currentText());
+      for (int i=0; i<4;i++) menu->actions().at(i)->setEnabled(false);
+    }
+    else {
+      scan->setEnabled(true);
+      devices->setEnabled(true);
+    }
+    bind->setEnabled(true);
     delete t;
   }
 
