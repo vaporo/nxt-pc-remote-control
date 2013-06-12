@@ -4,5 +4,8 @@
         <file>images/info-eng.png</file>
         <file>images/info-spa.png</file>
         <file>images/about.png</file>
+        <file>images/off.png</file>
+        <file>images/on.png</file>
+        <file>images/logo.gif</file>
     </qresource>
 </RCC>

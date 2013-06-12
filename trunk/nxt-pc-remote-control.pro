@@ -8,7 +8,8 @@ SOURCES += \
 HEADERS += \
     window.h \
     network.h \
-    idiom.h
+    idiom.h \
+    configuration.h
 
 RESOURCES += \
     resources.qrc
