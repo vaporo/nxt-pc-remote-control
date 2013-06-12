@@ -81,8 +81,7 @@ protected:
  */
 class Thread : public QThread {
     Q_OBJECT
-private:
-
+    private:
     QComboBox* devices;
     Network* net;
     int operation;
@@ -100,29 +99,31 @@ public:
     * @brief Thread constructor receive device combo and network references
     * to allow work with them.
     */
-    Thread(QComboBox* combo,Network* n,int op):devices(combo), net(n), operation(op){}
+    Thread(QComboBox* combo,Network* n,int op)
+        :devices(combo), net(n), operation(op)  {
+    }
 
     /** ----------------------------------------------------------------------
     * @brief run method has actions to exec in thread.
     */
     void run() {
         switch (operation) {
-            case 1:
-                try {
-                    QStringList s = net->scanDevices();
-                    devices->clear();
-                    devices->addItems(s);
-                    emit scanPerformed(0);
-                }
-                catch(int e) {
-                    devices->clear();
-                    emit scanPerformed(e);
-                }
-                break;
-            case 2:
-                bool state = net->bind(devices->currentText().left(17));
-                emit connectPerformed(state);
-                break;
+        case 1:
+            try {
+                QStringList s = net->scanDevices();
+                devices->clear();
+                devices->addItems(s);
+                emit scanPerformed(0);
+            }
+            catch(int e) {
+                devices->clear();
+                emit scanPerformed(e);
+            }
+            break;
+        case 2:
+            bool state = net->bind(devices->currentText().left(17));
+            emit connectPerformed(state);
+            break;
         }
     }
 };
@@ -140,7 +141,6 @@ private:
     byte                power;
     MyButton            *scan,*bind;
     QComboBox           *devices;
-    QLabel              *info;
     Network             *net;
     QMenu               *recents,*selectidiom;
     Idiom               idiom;
@@ -227,7 +227,7 @@ private:
         scan->setText(idiom.getScanButtonLabel());
         scan->isEnabled() ? bind->setText(idiom.getConnectButtonLabel()) :
         bind->setText(idiom.getDisconnectButtonLabel());
-        info->setPixmap(QPixmap(idiom.getImageInfo()));
+
         selectidiom->actions().at(0)->setText(idiom.getMenuEnglish());
         selectidiom->actions().at(1)->setText(idiom.getMenuSpanish());
         menu->actions().at(0)->setText(idiom.getMenuSelectIdiom());
@@ -272,7 +272,7 @@ public:
         scan                    = new MyButton(idiom.getScanButtonLabel(),this);
         devices                 = new QComboBox(this);
         bind                    = new MyButton(idiom.getConnectButtonLabel(),this);
-        info                    = new QLabel();
+
         add                     = new MyButton(idiom.getAdd(),this);
         gMotorA                 = new QGroupBox("Motor A",this);
         gMotorB                 = new QGroupBox("Motor B",this);
@@ -292,7 +292,7 @@ public:
         BDir                    = new QComboBox(gMotorB);
         CDir                    = new QComboBox(gMotorC);
 
-        info                    -> setVisible(false);
+
         add                     -> setGeometry(320,650,87,27);
         scan                    -> setGeometry(30,30,87,27);
         devices                 -> setGeometry(30,60,281,25);
@@ -372,7 +372,7 @@ public:
 
         devices                 -> setEnabled(false);
         bind                    -> setEnabled(false);
-        info                    -> setPixmap(QPixmap(idiom.getImageInfo()));
+
 
         setFixedSize(630,700);
         recents                 = new QMenu(idiom.getMenuRecentConnections());
@@ -811,8 +811,6 @@ public slots:
     */
     void showAbout(bool state) {
         if (state==true) {
-            //info->setPixmap(QPixmap(":/images/about.png"));
-            //info->setVisible(true);
             QWidget *w=new QWidget();
 
             w->resize(300,500);
@@ -849,8 +847,9 @@ public slots:
             text[7]->setGeometry(30,400,300,20);
 
             text[6]=new QLabel("felipero25@gmail.com",w);
-            text[6]->setGeometry(80,420,300,20);
+            text[6]->setGeometry(80,430,300,20);
             w->setVisible(true);
+
         }
     }
 };

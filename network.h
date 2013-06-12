@@ -129,10 +129,11 @@ public:
             < 0) {
           strcpy(name, "unknown");
         }
-        char text[30];
+
+        char text[100];
         sprintf(text,"%s  [%s]",addr,name);
         devices.append(text);
-        //printf("%s  %s\n", addr, name);
+
     }
 
     free( ii );
